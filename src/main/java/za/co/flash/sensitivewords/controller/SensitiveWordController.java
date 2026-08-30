@@ -40,11 +40,13 @@ public class SensitiveWordController {
     // =========================================================
     // JSON INPUT
     // =========================================================
+
     @PostMapping("/add-from-json")
-    @Operation(summary = "Add sensitive words using JSON",
+    @Operation(
+            summary = "Add sensitive words using JSON",
             description = """
                     Adds one or multiple sensitive words using JSON.
-                    
+
                     Example:
                     {
                       "words": [
@@ -55,19 +57,21 @@ public class SensitiveWordController {
                     }
                     """
     )
-    @ApiResponses({@ApiResponse(responseCode = "201", description = "Sensitive words processed successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "409", description = "One or more words already exist")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Sensitive words processed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request")
     })
+    public ResponseEntity<SensitiveWordInputResponse> addFromJson(
+            @Valid @RequestBody SensitiveWordInputRequest request,
+            Principal principal) {
 
-    public ResponseEntity<SensitiveWordInputResponse> addFromJson(@Valid @RequestBody SensitiveWordInputRequest request, Principal principal) {
-
-        SensitiveWordInputRequest inputRequest = SensitiveWordInputRequest.builder().inputType(InputType.JSON)
+        SensitiveWordInputRequest inputRequest = SensitiveWordInputRequest.builder()
+                .inputType(InputType.JSON)
                 .words(request.getWords())
                 .build();
 
-
-        SensitiveWordInputResponse response = sensitiveWordInputService.process(inputRequest, principal.getName());
+        SensitiveWordInputResponse response = sensitiveWordInputService.process(
+                inputRequest, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -77,30 +81,21 @@ public class SensitiveWordController {
     // FILE INPUT
     // =========================================================
 
-    @Operation(summary = "Add sensitive words from a file", description = "Uploads" +
-            " sensitive words using a supported file format. Supported file" +
-            " types:  TXT , CSV The file type must be explicitly supplied.")
+    @PostMapping(value = "/add-from-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Add sensitive words from a file",
+            description = "Uploads sensitive words using a supported file format. Supported file types: TXT and CSV."
+    )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "File processed successfully"
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid or unsupported file"
-            ),
-            @ApiResponse(
-                    responseCode = "415",
-                    description = "Unsupported media type"
-            )
+            @ApiResponse(responseCode = "201", description = "File processed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid or unsupported file")
     })
-    @PostMapping(value = "/add-from-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SensitiveWordInputResponse> addFromFile(
             @Parameter(description = "File containing sensitive words", required = true)
             @RequestPart("file") MultipartFile file,
             @Parameter(description = "Format of the uploaded file", example = "TXT", required = true)
-            @RequestParam("fileType") FileType fileType, Principal principal) {
+            @RequestParam FileType fileType,
+            Principal principal) {
 
         SensitiveWordInputRequest request = SensitiveWordInputRequest.builder()
                 .inputType(InputType.FILE)
@@ -108,7 +103,8 @@ public class SensitiveWordController {
                 .file(file)
                 .build();
 
-        SensitiveWordInputResponse response = sensitiveWordInputService.process(request, principal.getName());
+        SensitiveWordInputResponse response =
+                sensitiveWordInputService.process(request, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -117,21 +113,24 @@ public class SensitiveWordController {
     // =========================================================
     // READ
     // =========================================================
+
+    @GetMapping("/get-by-status")
     @Operation(summary = "Get sensitive words",
-            description = "Returns a paginated list of sensitive words. Optionally filter by active status.")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<SensitiveWord>> getAll(@RequestParam(required = false) Boolean active, Pageable pageable) {
+            description = "Returns a paginated list of sensitive words. Optionally filter by active status."
+    )
+    public ResponseEntity<Page<SensitiveWord>> getAll(@RequestParam(required = false) Boolean active,
+            Pageable pageable) {
 
         return ResponseEntity.ok(sensitiveWordService.findAll(active, pageable));
     }
 
 
-
-    @Operation(summary = "Get sensitive word by word/phrase")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Sensitive word found"),
-            @ApiResponse(responseCode = "404", description = "Sensitive word not found")
-    })
     @GetMapping("/get-word")
+    @Operation(summary = "Get sensitive word by word or phrase")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sensitive word found"),
+            @ApiResponse(responseCode = "400", description = "Sensitive word not found")
+    })
     public ResponseEntity<SensitiveWord> getByWord(@RequestParam String word) {
 
         return ResponseEntity.ok(sensitiveWordService.findByWord(word));
@@ -142,9 +141,10 @@ public class SensitiveWordController {
     // UPDATE
     // =========================================================
 
+    @PutMapping("/update-word")
     @Operation(summary = "Update a sensitive word")
-    @PutMapping("update-word")
-    public ResponseEntity<SensitiveWord> update(@RequestParam String word, String newWord, Principal principal) {
+    public ResponseEntity<SensitiveWord> update(@RequestParam String word, @RequestParam String newWord,
+            Principal principal) {
 
         return ResponseEntity.ok(sensitiveWordService.update(word, newWord, principal.getName()));
     }
@@ -154,14 +154,10 @@ public class SensitiveWordController {
     // DISABLE / DELETE
     // =========================================================
 
-    @Operation(
-            summary = "Disable a sensitive word",
-            description = " Performs a soft delete by disabling the sensitive word." +
-                    "The record is retained for auditing purposes.")
-    @ApiResponses({@ApiResponse(responseCode = "204",
-            description = "Sensitive word disabled successfully"),
-            @ApiResponse(responseCode = "404", description = "Sensitive word not found")})
     @DeleteMapping("/disable-word")
+    @Operation(summary = "Disable a sensitive word",
+            description = "Performs a soft delete by disabling the sensitive word. The record is retained for auditing purposes."
+    )
     public ResponseEntity<Void> disable(@RequestParam String word, Principal principal) {
 
         sensitiveWordService.disable(word, principal.getName());
@@ -174,27 +170,27 @@ public class SensitiveWordController {
     // ENABLE
     // =========================================================
 
+    @PatchMapping("/enable-word")
     @Operation(summary = "Enable a sensitive word")
-    @PatchMapping( "/enable-word")
     public ResponseEntity<SensitiveWord> enable(@RequestParam String word, Principal principal) {
 
         return ResponseEntity.ok(sensitiveWordService.enable(word, principal.getName()));
     }
+
+
+    // =========================================================
+    // CACHE
+    // =========================================================
+
     @PostMapping("/refresh-cache")
-    @Operation(
-            summary = "Refresh sensitive words cache",
-            description = "Reloads all active sensitive words from the database into the application cache"
+    @Operation(summary = "Refresh sensitive words cache",
+            description = "Reloads all active sensitive words from the database into the application cache."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Cache refreshed successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
     public ResponseEntity<Map<String, String>> refreshCache() {
 
         sensitiveWordCacheService.refresh();
 
-        return ResponseEntity.ok(Map.of("message", "Sensitive words cache refreshed successfully"));
+        return ResponseEntity.ok(Map.of("message", "Sensitive words " +
+                "cache refreshed successfully"));
     }
-
 }

@@ -1,5 +1,6 @@
 package za.co.flash.sensitivewords.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request,
-            HttpServletResponse response, Authentication authentication) {
+    @Operation(
+            summary = "Logout",
+            description = "Logs out the authenticated user and clears the security context"
+    )
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) {
 
         new SecurityContextLogoutHandler().logout(request, response, authentication);
 
