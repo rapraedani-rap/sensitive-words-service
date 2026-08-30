@@ -15,7 +15,7 @@ public interface SensitiveWordService {
     @Transactional(readOnly = true)
     Page<SensitiveWord> findAll(Boolean active, Pageable pageable);
 
-    SensitiveWord update(String word, String changedBy);
+    SensitiveWord update(String word, String newWord, String changedBy);
 
     SensitiveWord enable(String word, String changedBy);
 

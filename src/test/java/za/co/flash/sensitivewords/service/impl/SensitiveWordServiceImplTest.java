@@ -391,22 +391,111 @@ class SensitiveWordServiceImplTest {
         when(sensitiveWordRepository.findByWordIgnoreCase("SELECT"))
                 .thenReturn(Optional.of(sensitiveWord));
 
+        when(sensitiveWordRepository.findByWordIgnoreCase("UPDATE"))
+                .thenReturn(Optional.empty());
+
         when(sensitiveWordRepository.save(sensitiveWord))
                 .thenReturn(sensitiveWord);
 
         SensitiveWord result =
-                sensitiveWordService.update("SELECT", changedBy);
+                sensitiveWordService.update("SELECT", "UPDATE", changedBy);
 
-        assertEquals("SELECT", result.getWord());
+        assertEquals("UPDATE", result.getWord());
+
+        verify(sensitiveWordRepository)
+                .findByWordIgnoreCase("SELECT");
+
+        verify(sensitiveWordRepository)
+                .findByWordIgnoreCase("UPDATE");
 
         verify(sensitiveWordRepository)
                 .save(sensitiveWord);
 
         verify(auditService).recordUpdate(sensitiveWord, "SELECT",
-                        "SELECT",
-                        "admin"
-                );
+                "UPDATE",
+                "admin"
+        );
 
         verify(sensitiveWordCacheService).refresh();
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingSensitiveWordIsNotFound() {
+
+        when(sensitiveWordRepository.findByWordIgnoreCase("SELECT"))
+                .thenReturn(Optional.empty());
+
+        SensitiveWordException exception =
+                assertThrows(
+                        SensitiveWordException.class,
+                        () -> sensitiveWordService.update("SELECT", "UPDATE", changedBy)
+                );
+
+        assertEquals(
+                "Sensitive word not found: SELECT",
+                exception.getMessage()
+        );
+
+        verify(sensitiveWordRepository)
+                .findByWordIgnoreCase("SELECT");
+
+        verify(sensitiveWordRepository, never())
+                .save(any());
+
+        verify(auditService, never())
+                .recordUpdate(any(), anyString(), anyString(), anyString());
+
+        verify(sensitiveWordCacheService, never())
+                .refresh();
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenUpdatedSensitiveWordAlreadyExists() {
+
+        SensitiveWord sensitiveWord = SensitiveWord.builder()
+                .id(1L)
+                .word("SELECT")
+                .active(true)
+                .build();
+
+        SensitiveWord existingWord = SensitiveWord.builder()
+                .id(2L)
+                .word("UPDATE")
+                .active(true)
+                .build();
+
+        when(sensitiveWordRepository.findByWordIgnoreCase("SELECT"))
+                .thenReturn(Optional.of(sensitiveWord));
+
+        when(sensitiveWordRepository.findByWordIgnoreCase("UPDATE"))
+                .thenReturn(Optional.of(existingWord));
+
+        SensitiveWordException exception =
+                assertThrows(
+                        SensitiveWordException.class,
+                        () -> sensitiveWordService.update("SELECT", "UPDATE", changedBy)
+                );
+
+        assertEquals(
+                "Sensitive word already exists: UPDATE",
+                exception.getMessage()
+        );
+
+        verify(sensitiveWordRepository)
+                .findByWordIgnoreCase("SELECT");
+
+        verify(sensitiveWordRepository)
+                .findByWordIgnoreCase("UPDATE");
+
+        verify(sensitiveWordRepository, never())
+                .save(any());
+
+        verify(auditService, never())
+                .recordUpdate(any(), anyString(), anyString(), anyString());
+
+        verify(sensitiveWordCacheService, never())
+                .refresh();
     }
 }

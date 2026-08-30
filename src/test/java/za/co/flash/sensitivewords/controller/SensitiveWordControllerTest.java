@@ -62,9 +62,9 @@ class SensitiveWordControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "words": [
-                                    "SELECT",
-                                    "DROP"
+                                   "words": [
+                                     "SELECT",
+                                     "DROP"
                                   ]
                                 }
                                 """))
@@ -190,25 +190,26 @@ class SensitiveWordControllerTest {
 
         SensitiveWord sensitiveWord = SensitiveWord.builder()
                 .id(1L)
-                .word("SELECT")
+                .word("UPDATE")
                 .active(true)
                 .build();
 
-        when(sensitiveWordService.update("SELECT", "admin"))
+        when(sensitiveWordService.update("SELECT", "UPDATE", "admin"))
                 .thenReturn(sensitiveWord);
 
         mockMvc.perform(put("/api/v1/sensitive-words/update-word")
                         .with(user("admin").roles("ADMIN"))
                         .principal(() -> "admin")
-                        .param("word", "SELECT"))
+                        .param("word", "SELECT")
+                        .param("newWord", "UPDATE"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.word").value("SELECT"))
+                .andExpect(jsonPath("$.word").value("UPDATE"))
                 .andExpect(jsonPath("$.active").value(true));
 
         verify(sensitiveWordService)
-                .update("SELECT", "admin");
+                .update("SELECT", "UPDATE", "admin");
     }
 
 

@@ -8,6 +8,8 @@ import za.co.flash.sensitivewords.enums.AuditAction;
 import za.co.flash.sensitivewords.repository.SensitiveWordAuditRepository;
 import za.co.flash.sensitivewords.service.SensitiveWordAuditService;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class SensitiveWordAuditServiceImpl implements SensitiveWordAuditService {
@@ -39,6 +41,7 @@ public class SensitiveWordAuditServiceImpl implements SensitiveWordAuditService 
 
         auditRepository.save(SensitiveWordAudit.builder().sensitiveWord(word)
                         .action(action).oldValue(oldValue).newValue(newValue)
+                        .changedAt(LocalDateTime.now())
                         .changedBy(changedBy).build());
     }
 }

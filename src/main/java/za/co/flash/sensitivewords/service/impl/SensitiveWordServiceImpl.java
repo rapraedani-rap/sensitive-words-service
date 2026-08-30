@@ -88,34 +88,34 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
 
     @Override
     @Transactional
-    public SensitiveWord update(String word, final String changedBy) {
+    public SensitiveWord update(String word, String newWord, final String changedBy) {
 
-        log.info("Updating sensitive word. word={}", word);
+        log.info("Updating sensitive word. word={}, newWord={}", word, newWord);
 
         SensitiveWord sensitiveWord = findByWord(word);
 
         String oldValue = sensitiveWord.getWord();
-        String normalizedWord = normalize(word);
+        String normalizedNewWord = normalize(newWord);
 
-        sensitiveWordRepository.findByWordIgnoreCase(normalizedWord)
+        sensitiveWordRepository.findByWordIgnoreCase(normalizedNewWord)
                 .filter(existing -> !existing.getId().equals(sensitiveWord.getId()))
                 .ifPresent(existing -> {
 
-                    log.info("Sensitive word already exists. word={}", normalizedWord);
+                    log.info("Sensitive word already exists. word={}", normalizedNewWord);
 
-                    throw new SensitiveWordException("Sensitive word already exists: " + normalizedWord);
+                    throw new SensitiveWordException("Sensitive word already exists: " + normalizedNewWord);
                 });
 
-        sensitiveWord.setWord(normalizedWord);
+        sensitiveWord.setWord(normalizedNewWord);
 
         SensitiveWord updated = sensitiveWordRepository.save(sensitiveWord);
 
-        auditService.recordUpdate(updated, oldValue, normalizedWord, changedBy);
+        auditService.recordUpdate(updated, oldValue, normalizedNewWord, changedBy);
 
         sensitiveWordCacheService.refresh();
 
         log.info("Sensitive word updated successfully. id={}, oldValue={}, newValue={}, changedBy={}",
-                updated.getId(), oldValue, normalizedWord, changedBy);
+                updated.getId(), oldValue, normalizedNewWord, changedBy);
 
         return updated;
     }

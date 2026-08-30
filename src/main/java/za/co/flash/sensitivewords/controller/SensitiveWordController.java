@@ -144,9 +144,9 @@ public class SensitiveWordController {
 
     @Operation(summary = "Update a sensitive word")
     @PutMapping("update-word")
-    public ResponseEntity<SensitiveWord> update(@RequestParam String word, Principal principal) {
+    public ResponseEntity<SensitiveWord> update(@RequestParam String word, String newWord, Principal principal) {
 
-        return ResponseEntity.ok(sensitiveWordService.update(word, principal.getName()));
+        return ResponseEntity.ok(sensitiveWordService.update(word, newWord, principal.getName()));
     }
 
 
