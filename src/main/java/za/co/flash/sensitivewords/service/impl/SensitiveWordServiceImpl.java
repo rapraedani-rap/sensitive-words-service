@@ -15,6 +15,7 @@ import za.co.flash.sensitivewords.service.SensitiveWordAuditService;
 import za.co.flash.sensitivewords.service.SensitiveWordCacheService;
 import za.co.flash.sensitivewords.service.SensitiveWordService;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Slf4j
@@ -107,6 +108,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
                 });
 
         sensitiveWord.setWord(normalizedNewWord);
+        sensitiveWord.setUpdatedAt(LocalDateTime.now());
 
         SensitiveWord updated = sensitiveWordRepository.save(sensitiveWord);
 
@@ -137,6 +139,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
         }
 
         sensitiveWord.setActive(false);
+        sensitiveWord.setUpdatedAt(LocalDateTime.now());
 
         SensitiveWord updated = sensitiveWordRepository.save(sensitiveWord);
 
