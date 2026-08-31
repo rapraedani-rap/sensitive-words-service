@@ -568,7 +568,7 @@ POST /api/v1/sensitive-words/add-from-json
   ]
 }
 ```
-
+![img_2.png](img_2.png)
 ### Example Response
 
 ```json
@@ -622,7 +622,7 @@ Example:
 ```text
 fileType=TXT
 ```
-
+![img_1.png](img_1.png)
 The request is converted internally into:
 
 ```text
@@ -723,8 +723,9 @@ Pagination is supported through Spring Data `Pageable`.
 For example:
 
 ```http
-GET /api/v1/sensitive-words?active=true&page=0&size=20
+GET /api/v1/sensitive-words/get-by-status?active=true&page=0&size=20&sort=Active
 ```
+![img.png](img.png)
 
 ---
 
