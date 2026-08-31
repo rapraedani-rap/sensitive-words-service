@@ -1502,9 +1502,6 @@ The following enhancements could be introduced for a larger production implement
 
 Synchronize rule changes between multiple application instances using Redis or event-driven invalidation.
 
-### Database Migration Management
-
-Use Flyway or Liquibase to version and automatically apply database schema changes.
 
 ### External Identity Provider
 
