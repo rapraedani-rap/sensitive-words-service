@@ -709,22 +709,25 @@ Successful response:
 ### Get Sensitive Words
 
 ```http
-GET /api/v1/sensitive-words
+GET /api/v1/sensitive-words/get-by-status
 ```
 
 Optional active filter:
 
 ```http
-GET /api/v1/sensitive-words?active=true
+GET /api/v1/sensitive-words/get-by-status?active=true
 ```
 
 Pagination is supported through Spring Data `Pageable`.
 
 For example:
-
+get active words in unsorted request:
+![img_3.png](img_3.png)
 ```http
-GET /api/v1/sensitive-words/get-by-status?active=true&page=0&size=20&sort=Active
+GET /api/v1/sensitive-words/get-by-status?active=true&page=0&size=10
 ```
+get active words in sorted order request:
+
 ![img.png](img.png)
 
 ---
