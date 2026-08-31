@@ -62,16 +62,11 @@ public class SensitiveWordController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     public ResponseEntity<SensitiveWordInputResponse> addFromJson(
-            @Valid @RequestBody SensitiveWordInputRequest request,
-            Principal principal) {
+            @Valid @RequestBody SensitiveWordInputRequest request, Principal principal) {
 
-        SensitiveWordInputRequest inputRequest = SensitiveWordInputRequest.builder()
-                .inputType(InputType.JSON)
-                .words(request.getWords())
-                .build();
 
         SensitiveWordInputResponse response = sensitiveWordInputService.process(
-                inputRequest, principal.getName());
+                request, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -94,8 +89,7 @@ public class SensitiveWordController {
             @Parameter(description = "File containing sensitive words", required = true)
             @RequestPart("file") MultipartFile file,
             @Parameter(description = "Format of the uploaded file", example = "TXT", required = true)
-            @RequestParam FileType fileType,
-            Principal principal) {
+            @RequestParam FileType fileType, Principal principal) {
 
         SensitiveWordInputRequest request = SensitiveWordInputRequest.builder()
                 .inputType(InputType.FILE)
@@ -103,8 +97,7 @@ public class SensitiveWordController {
                 .file(file)
                 .build();
 
-        SensitiveWordInputResponse response =
-                sensitiveWordInputService.process(request, principal.getName());
+        SensitiveWordInputResponse response = sensitiveWordInputService.process(request, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
