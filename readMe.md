@@ -726,7 +726,8 @@ unsorted:
 ```http
 GET /api/v1/sensitive-words/get-by-status?active=true&page=0&size=10
 ```
-sorted
+sorted order:
+
 ![img.png](img.png)
 
 ---
