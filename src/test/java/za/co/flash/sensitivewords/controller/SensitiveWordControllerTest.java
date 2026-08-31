@@ -141,7 +141,7 @@ class SensitiveWordControllerTest {
         when(sensitiveWordService.findAll(eq(true), any()))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/v1/sensitive-words")
+        mockMvc.perform(get("/api/v1/sensitive-words/get-by-status")
                         .with(user("admin").roles("ADMIN"))
                         .principal(() -> "admin")
                         .param("active", "true")
