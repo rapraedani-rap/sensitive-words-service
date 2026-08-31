@@ -721,7 +721,7 @@ GET /api/v1/sensitive-words/get-by-status?active=true
 Pagination is supported through Spring Data `Pageable`.
 
 For example:
-get active words in unsorted request:
+get active words in unsorted order request:
 ![img_3.png](img_3.png)
 ```http
 GET /api/v1/sensitive-words/get-by-status?active=true&page=0&size=10
