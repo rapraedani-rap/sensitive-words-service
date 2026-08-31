@@ -7,7 +7,7 @@ The service provides:
 - RESTful APIs for sensitive-word management
 - Text sanitization
 - MSSQL persistence
-- JSON, TXT and CSV sensitive-word input
+- JSON, TXT and CSV(csv logic was not implemented fully ,it was intended to present basic pattern structure) sensitive-word input
 - Case-insensitive matching
 - Support for multi-word sensitive phrases
 - In-memory compiled sanitization rules
@@ -1686,7 +1686,7 @@ It also allows a previously configured rule to be enabled again without recreati
 
 ### Why Strategy Pattern for Input?
 
-JSON, TXT and CSV are input mechanisms, not different business operations.
+JSON, TXT and CSV (was not implemented fully, just a basic structure) are input mechanisms, not different business operations.
 
 Each strategy is responsible for extracting words from its format.
 
